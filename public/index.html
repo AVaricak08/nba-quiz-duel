@@ -14,12 +14,27 @@
         <p id="status">Connecting...</p>
     </header>
 
-    <main>
+    <!-- Login -->
+    <div id="login">
+        <label for="nicknameInput">Enter your nickname:</label>
+        <input type="text" id="nicknameInput" placeholder="Your nickname">
+        <button id="setNicknameBtn">Set Nickname</button>
+    </div>
+
+    <!-- Ready screen -->
+    <div id="readyDiv" style="display:none;">
+        <p id="readyStatus">Waiting to mark ready...</p>
+        <button id="readyBtn">Ready</button>
+    </div>
+
+    <main style="display:none;" id="mainGame">
         <section id="scoreboard">
             <div id="score">Player 1: 0 | Player 2: 0</div>
+            <div id="record">Wins: 0 | Losses: 0</div>
         </section>
 
         <section id="quiz">
+            <div id="timer" class="timer">10s</div>
             <div id="question">Waiting for question...</div>
             <div id="answers"></div>
         </section>
