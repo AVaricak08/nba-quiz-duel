@@ -31,7 +31,7 @@ socket.on("new-question", (data) => {
 
     statusEl.innerText = "You have 10 seconds!";
     setTimeout(() => {
-        canAnswer = false;
+        canAnswer = false; // igrač više ne može kliknuti
     }, 10000); // 10 sekundi
 });
 

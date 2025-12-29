@@ -45,9 +45,7 @@ io.on("connection", (socket) => {
             scores[playerNumber]++;
             io.emit("status-update", `Player ${playerNumber} scored!`);
         } else {
-            let other = playerNumber === 1 ? 2 : 1;
-            scores[other]++;
-            io.emit("status-update", `Player ${playerNumber} answered wrong. Player ${other} scores!`);
+            io.emit("status-update", `Player ${playerNumber} answered wrong.`);
         }
 
         io.emit("score-update", scores);
@@ -55,7 +53,7 @@ io.on("connection", (socket) => {
         if (scores[1] >= 11) io.emit("status-update", "Player 1 wins!");
         else if (scores[2] >= 11) io.emit("status-update", "Player 2 wins!");
         else {
-            // prikazujemo odgovor 3 sekunde pre nego što pošaljemo novo pitanje
+            // Prikaz odgovora 3 sekunde pre nego što pošaljemo novo pitanje
             showAnswerTimeout = setTimeout(() => sendQuestion(), 3000);
         }
     });
