@@ -1,35 +1,47 @@
 const socket = io();
 
-let playerNumber = null;
+let playerNumber;
+let canAnswer = false;
 
-socket.on("player-number", num => {
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const scoreEl = document.getElementById("score");
+const statusEl = document.getElementById("status");
+
+socket.on("player-number", (num) => {
     playerNumber = num;
-    document.getElementById("player").innerText = `You are Player ${num}`;
+    statusEl.innerText = `You are Player ${playerNumber}`;
 });
 
-socket.on("question", q => {
-    document.getElementById("question").innerText = q.q;
-    const answersDiv = document.getElementById("answers");
-    answersDiv.innerHTML = "";
+socket.on("new-question", (data) => {
+    questionEl.innerText = data.q;
+    answersEl.innerHTML = "";
+    canAnswer = true;
 
-    q.answers.forEach((a, i) => {
+    data.answers.forEach((ans, idx) => {
         const btn = document.createElement("button");
-        btn.innerText = a;
-        btn.onclick = () => socket.emit("answer", i);
-        answersDiv.appendChild(btn);
+        btn.innerText = ans;
+        btn.onclick = () => answerQuestion(idx);
+        answersEl.appendChild(btn);
     });
+
+    statusEl.innerText = "You have 3 seconds!";
+    setTimeout(() => {
+        canAnswer = false;
+        statusEl.innerText = "Time's up!";
+    }, 3000);
 });
 
-socket.on("attack", data => {
-    document.getElementById("status").innerText =
-        `Player ${data.player} scores! 🏀`;
+function answerQuestion(idx) {
+    if (!canAnswer) return;
+    canAnswer = false; // samo prvi klik
+    socket.emit("answer", idx);
+}
+
+socket.on("score-update", (data) => {
+    scoreEl.innerText = `Player 1: ${data[1]} | Player 2: ${data[2]}`;
 });
 
-socket.on("score-update", score => {
-    document.getElementById("score").innerText =
-        `${score[1]} : ${score[2]}`;
-});
-
-socket.on("winner", player => {
-    alert(`🏆 Player ${player} wins!`);
+socket.on("status-update", (msg) => {
+    statusEl.innerText = msg;
 });
