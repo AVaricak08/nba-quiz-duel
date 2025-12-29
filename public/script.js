@@ -29,11 +29,10 @@ socket.on("new-question", (data) => {
         answersEl.appendChild(btn);
     });
 
-    statusEl.innerText = "You have 3 seconds!";
+    statusEl.innerText = "You have 10 seconds!";
     setTimeout(() => {
         canAnswer = false;
-        statusEl.innerText = "Time's up!";
-    }, 3000);
+    }, 10000); // 10 sekundi
 });
 
 function answerQuestion(idx) {
@@ -42,17 +41,15 @@ function answerQuestion(idx) {
     socket.emit("answer", idx);
 }
 
-// Score update sa animacijom
 socket.on("score-update", (data) => {
     scoreEl.innerText = `Player 1: ${data[1]} | Player 2: ${data[2]}`;
     scoreEl.classList.add("flash-score");
     setTimeout(() => scoreEl.classList.remove("flash-score"), 300);
 });
 
-// Status update sa zvukom
 socket.on("status-update", (msg) => {
     statusEl.innerText = msg;
 
     if (msg.includes("scored")) correctSound.play();
-    if (msg.includes("wrong") || msg.includes("No one answered")) wrongSound.play();
+    if (msg.includes("wrong") || msg.includes("Time's up")) wrongSound.play();
 });
