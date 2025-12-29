@@ -10,20 +10,32 @@ const questions = JSON.parse(fs.readFileSync("server/questions.json"));
 
 app.use(express.static("public"));
 
+// GLOBALNI BROJAČ IGRAČA
+let playerCount = 0;
+
 // Score tracking
 let scores = {1: 0, 2: 0};
 let currentQuestion = null;
 let questionAnswered = false;
 
 io.on("connection", (socket) => {
-    let playerNumber = Object.keys(io.sockets.sockets).length; // 1 ili 2
+    playerCount++;
+    let playerNumber = playerCount;
     socket.emit("player-number", playerNumber);
 
-    // Send first question when player connects
+    console.log(`Player ${playerNumber} connected`);
+
+    // Kada igrač izađe, smanjuj brojač
+    socket.on("disconnect", () => {
+        playerCount--;
+        console.log(`Player ${playerNumber} disconnected`);
+    });
+
+    // Početno pitanje kada se prvi igrač konektuje
     if (!currentQuestion) sendQuestion();
 
     socket.on("answer", (answerIdx) => {
-        if (questionAnswered) return; // samo prvi
+        if (questionAnswered) return; // samo prvi odgovor
         questionAnswered = true;
 
         if (answerIdx === currentQuestion.correct) {
@@ -37,10 +49,10 @@ io.on("connection", (socket) => {
 
         io.emit("score-update", scores);
 
-        // Check for winner
+        // Provera pobednika
         if (scores[1] >= 11) io.emit("status-update", "Player 1 wins!");
         else if (scores[2] >= 11) io.emit("status-update", "Player 2 wins!");
-        else setTimeout(sendQuestion, 1000); // next question after 1s
+        else setTimeout(sendQuestion, 1000); // sledeće pitanje posle 1s
     });
 });
 
@@ -50,7 +62,7 @@ function sendQuestion() {
     io.emit("new-question", currentQuestion);
 }
 
-// RADI I NA RAILWAY I LOKALNO
+// Railway port ili lokalni 3000
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
