@@ -2,16 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Quiz Duel</title>
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>NBA Quiz Duel</h1>
-    <div id="status">Connecting...</div>
-    <div id="score">Player 1: 0 | Player 2: 0</div>
-    <div id="question"></div>
-    <div id="answers"></div>
+    <header>
+        <h1>🏀 NBA Quiz Duel 🏀</h1>
+        <p id="status">Connecting...</p>
+    </header>
+
+    <main>
+        <section id="scoreboard">
+            <div id="score">Player 1: 0 | Player 2: 0</div>
+        </section>
+
+        <section id="quiz">
+            <div id="question">Waiting for question...</div>
+            <div id="answers"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>First to 11 points wins!</p>
+    </footer>
 </body>
 </html>

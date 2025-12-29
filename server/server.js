@@ -17,6 +17,7 @@ let playerCount = 0;
 let scores = {1: 0, 2: 0};
 let currentQuestion = null;
 let questionAnswered = false;
+let questionTimeout = null;
 
 io.on("connection", (socket) => {
     playerCount++;
@@ -38,6 +39,8 @@ io.on("connection", (socket) => {
         if (questionAnswered) return; // samo prvi odgovor
         questionAnswered = true;
 
+        clearTimeout(questionTimeout); // zaustavi timeout jer je neko odgovorio
+
         if (answerIdx === currentQuestion.correct) {
             scores[playerNumber]++;
             io.emit("status-update", `Player ${playerNumber} scored!`);
@@ -56,14 +59,25 @@ io.on("connection", (socket) => {
     });
 });
 
+let questionTimeout = null;
+
 function sendQuestion() {
     questionAnswered = false;
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     io.emit("new-question", currentQuestion);
-}
 
-// Railway port ili lokalni 3000
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+    // clear prethodni timeout
+    if (questionTimeout) clearTimeout(questionTimeout);
+
+    // postavi novi timeout 3s
+    questionTimeout = setTimeout(() => {
+        if (!questionAnswered) {
+            io.emit("status-update", "No one answered in time!");
+            // reset timeout pre nego što pozovemo sledeće pitanje
+            questionTimeout = null;
+            sendQuestion(); // šalje sledeće pitanje
+        }
+    }, 3000);
+}
+    // Timeout ako niko ne odgovori u 3 sekunde
+    if (questionTimeout) cl
